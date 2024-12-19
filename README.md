@@ -5,7 +5,7 @@ go code vulnerable to access control issue and the fix
 
 使い方
 
-accessVulnerable 脆弱なコード
+**accessVulnerable 脆弱なコード**
 
 リポジトリをクローンする
 ```
@@ -38,5 +38,17 @@ go run main.go
 http://127.0.0.1:8080/admin
 ```
 
+
+**accessFix 修正したコード**
+
+リポジトリをクローンする
+```
+git clone https://github.com/aoprea1982/goAccessControl
+```
+
+accessFixへ移動
+```
+cd accessFix
+```
 
 
