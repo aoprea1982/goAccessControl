@@ -22,7 +22,7 @@ cd accessVulnerable
 go run main.go
 ```
 
-ブラウザからhttp://127.0.0.1:8080/login　へアクセス
+ブラウザから`http://127.0.0.1:8080/admin`　へアクセス
 ```
 一般ユーザーアカウントクレデンシャル
 ユーザー名:user
