@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="hidden"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            text-align: center;
+            color: red;
+        }
+        .links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .links button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ログイン</h1>
+        <form id="loginForm">
+            <label for="username">ユーザー名</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" required>
+            <!-- 隠された CSRF トークンフィールド -->
+            <input type="hidden" id="csrfToken" name="csrfToken">
+            <button type="submit">ログイン</button>
+        </form>
+        <div id="message" class="message"></div>
+        <div class="links">
+            <button onclick="fetchProtectedContent('/user')">ユーザーコンテンツを取得</button>
+            <button onclick="fetchProtectedContent('/admin')">管理者コンテンツを取得</button>
+        </div>
+    </div>
+
+    <script>
+        // ページ読み込み時にサーバーから CSRF トークンを取得
+        async function fetchCsrfToken() {
+            try {
+                const response = await fetch('/csrf-token', {
+                    method: 'GET',
+                    credentials: 'same-origin', // クッキーを含む
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('csrfToken').value = data.csrfToken;
+                } else {
+                    console.error('CSRF トークンの取得に失敗しました');
+                }
+            } catch (error) {
+                console.error('CSRF トークンの取得エラー:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchCsrfToken);
+
+        // ログインフォームの送信を処理
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const csrfToken = document.getElementById('csrfToken').value;
+            const messageDiv = document.getElementById('message');
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&csrfToken=${encodeURIComponent(csrfToken)}`,
+                });
+
+                if (response.ok) {
+                    const token = response.headers.get('Authorization').replace('Bearer ', '');
+                    localStorage.setItem('authToken', token);
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = 'ログイン成功！';
+                } else {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = 'ログインに失敗しました。資格情報を確認してください。';
+                }
+            } catch (error) {
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = 'ログイン中にエラーが発生しました。';
+            }
+        });
+
+        // Authorization ヘッダーで保護されたコンテンツを取得
+        async function fetchProtectedContent(url) {
+            const token = localStorage.getItem('authToken');
+
+            if (!token) {
+                alert('最初にログインしてください。');
+                return;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    alert(`レスポンス: ${JSON.stringify(data)}`);
+                } else {
+                    alert('コンテンツの取得に失敗しました。再ログインしてください。');
+                }
+            } catch (error) {
+                console.error('保護されたコンテンツの取得エラー:', error);
+            }
+        }
+    </script>
+</body>
+</html>
