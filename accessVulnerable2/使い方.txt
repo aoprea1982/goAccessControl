@@ -1,0 +1,47 @@
+**accessVulnerable2 脆弱なコード**
+
+リポジトリをクローンする
+```
+git clone https://github.com/aoprea1982/goAccessControl
+```
+
+accessVulnerableへ移動
+```
+cd accessVulnerable2
+```
+
+プログラムを実行
+```
+go run main.go
+```
+
+ブラウザから`http://127.0.0.1:8080/login`　へアクセス
+```
+一般ユーザーアカウントクレデンシャル
+ユーザー名:user1
+パスワード:user123
+
+一般ユーザーアカウントクレデンシャル
+ユーザー名:user2
+パスワード:user456
+
+管理者アカウントクレデンシャル
+ユーザー名:admin
+パスワード:admin123
+```
+
+user1 id "2"、ユーザーアカウントでログインした後、管理者エンドポイント"/api/users/1"、"/api/users/3"、"/api/users/1/apikey"、"/api/users/3/apikey"にアクセスします。ユーザーがそれにアクセス可能です。
+```
+http://127.0.0.1:8080/api/users/1
+http://127.0.0.1:8080/api/users/3
+http://127.0.0.1:8080/api/users/1/apikey
+http://127.0.0.1:8080/api/users/3/apikey
+```
+
+user2 id "3"、ユーザーアカウントでログインした後、管理者エンドポイント"/api/users/1"、"/api/users/2"、"/api/users/1/apikey"、"/api/users/2/apikey"にアクセスします。ユーザーがそれにアクセス可能です。
+```
+http://127.0.0.1:8080/api/users/1
+http://127.0.0.1:8080/api/users/2
+http://127.0.0.1:8080/api/users/1/apikey
+http://127.0.0.1:8080/api/users/2/apikey
+```
