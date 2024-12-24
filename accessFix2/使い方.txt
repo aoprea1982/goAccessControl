@@ -1,0 +1,59 @@
+**accessFix 修正したコード**
+
+リポジトリをクローンする
+```
+git clone https://github.com/aoprea1982/goAccessControl
+```
+
+accessFix2へ移動
+```
+cd accessFix2
+```
+
+プログラムを実行
+```
+go run main.go
+```
+
+ブラウザから`https://127.0.0.1:8080/login`　へアクセス
+```
+一般ユーザーアカウントクレデンシャル
+ユーザー名:user1
+パスワード:user123
+
+一般ユーザーアカウントクレデンシャル
+ユーザー名:user2
+パスワード:user456
+
+管理者アカウントクレデンシャル
+ユーザー名:admin
+パスワード:admin123
+```
+
+user1 id "2"、ユーザーアカウントでログインした後、"/api/users/1"、"/api/users/3"、"/api/users/1/apikey"、 "/api/users/3/apikey"、"/api/admin/dashboard"にアクセスします。ユーザーがそれにアクセスできません。
+
+
+```
+https://127.0.0.1:8080/api/users/1
+https://127.0.0.1:8080/api/users/3
+https://127.0.0.1:8080/api/users/1/apikey
+https://127.0.0.1:8080/api/users/3/apikey
+https://127.0.0.1:8080/api/admin/dashboard
+
+サーバのレスポンス
+アクセス権限がありません
+
+```
+
+user2 id "3"、ユーザーアカウントでログインした後、"/api/users/1"、"/api/users/2"、"/api/users/1/apikey"、 "/api/users/2/apikey"、"/api/admin/dashboard"にアクセスします。ユーザーがそれにアクセスできません。
+
+
+```
+https://127.0.0.1:8080/api/users/1
+https://127.0.0.1:8080/api/users/2
+https://127.0.0.1:8080/api/users/1/apikey
+https://127.0.0.1:8080/api/users/2/apikey
+https://127.0.0.1:8080/api/admin/dashboard
+
+サーバのレスポンス
+アクセス権限
